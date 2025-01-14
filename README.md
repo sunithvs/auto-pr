@@ -110,4 +110,4 @@ Special thanks to all the lazy developers out there who inspire us to automate e
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 
 ---
-Built with ❤️ and laziness by [Your Name]
+Built with ❤️ and laziness by [sunithvs]
