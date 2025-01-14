@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400">
+  <!-- Definitions -->
+  <defs>
+    <!-- Enhanced Gradients -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0D1117"/>
+      <stop offset="100%" style="stop-color:#161B22"/>
+    </linearGradient>
+    <linearGradient id="robotGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#79C0FF"/>
+      <stop offset="100%" style="stop-color:#1158C7"/>
+    </linearGradient>
+    <linearGradient id="prGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3FB950"/>
+      <stop offset="100%" style="stop-color:#238636"/>
+    </linearGradient>
+    <!-- Improved Glow Effect -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Text Shadow -->
+    <filter id="textGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="shadow"/>
+      <feFlood flood-color="white" flood-opacity="0.3" result="glow"/>
+      <feComposite in="glow" in2="shadow" operator="in" result="softGlow"/>
+      <feMerge>
+        <feMergeNode in="softGlow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background with subtle pattern -->
+  <rect width="1200" height="400" fill="url(#bgGradient)"/>
+  <path d="M0 150 Q 600 100, 1200 150" stroke="#30363D" stroke-width="1" fill="none" opacity="0.5"/>
+  <path d="M0 250 Q 600 300, 1200 250" stroke="#30363D" stroke-width="1" fill="none" opacity="0.5"/>
+
+  <!-- Command Box -->
+  <g transform="translate(300, 80)">
+    <rect width="600" height="40" rx="8" fill="#161B22" stroke="#30363D"/>
+    <text x="20" y="27" fill="#58A6FF" font-family="Monaco, monospace" font-size="16" filter="url(#textGlow)">
+      git commit -m "feat: awesome pr to main with 123"
+    </text>
+  </g>
+
+  <!-- Robot (Left) -->
+  <g transform="translate(200, 180)">
+    <rect x="0" y="0" width="100" height="120" rx="15" fill="url(#robotGradient)" filter="url(#glow)"/>
+    <rect x="15" y="20" width="70" height="50" rx="8" fill="#0D1117"/>
+    <circle cx="40" cy="45" r="8" fill="#58A6FF" filter="url(#glow)">
+      <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="60" cy="45" r="8" fill="#58A6FF" filter="url(#glow)">
+      <animate attributeName="opacity" values="1;0.5;1" dur="2s" repeatCount="indefinite"/>
+    </circle>
+    <rect x="45" y="-15" width="8" height="15" fill="url(#robotGradient)"/>
+    <circle cx="49" cy="-20" r="6" fill="#58A6FF" filter="url(#glow)">
+      <animate attributeName="r" values="6;8;6" dur="1s" repeatCount="indefinite"/>
+    </circle>
+  </g>
+
+  <!-- Automation Flow -->
+  <g transform="translate(400, 240)">
+    <line x1="0" y1="0" x2="400" y2="0" stroke="#58A6FF" stroke-width="3" stroke-dasharray="10,10">
+      <animate attributeName="stroke-dashoffset" values="20;0" dur="1s" repeatCount="indefinite"/>
+    </line>
+    <!-- Center Circle -->
+    <circle cx="200" cy="0" r="30" fill="none" stroke="#58A6FF" stroke-width="3" filter="url(#glow)">
+      <animateTransform attributeName="transform" type="rotate" from="0 200 0" to="360 200 0" dur="8s" repeatCount="indefinite"/>
+    </circle>
+    <circle cx="200" cy="0" r="10" fill="#58A6FF" filter="url(#glow)"/>
+  </g>
+
+  <!-- PR Icon (Right) -->
+  <g transform="translate(900, 180)">
+    <circle cx="0" cy="40" r="50" fill="url(#prGradient)" filter="url(#glow)"/>
+    <path d="M-20 40 L20 40 M0 20 L0 60 L20 40 L0 20" stroke="white" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Title -->
+  <g transform="translate(600, 320)">
+    <text text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="48" font-weight="bold" filter="url(#textGlow)">
+      Auto PR Creation
+    </text>
+    <text text-anchor="middle" y="35" fill="#8B949E" font-family="Arial, sans-serif" font-size="20">
+      Automation for the Lazy Developer
+    </text>
+  </g>
+</svg>
