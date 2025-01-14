@@ -1,5 +1,7 @@
 # 🤖 Auto PR Creation GitHub Action
 
+![Auto PR Creation](./banner.svg)
+
 Automate your Pull Request creation process with this GitHub Action! Simply include specific keywords in your commit message, and let the action handle the rest.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
