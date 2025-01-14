@@ -1,0 +1,124 @@
+name: Auto PR Creation
+
+# Default configuration
+env:
+  DEFAULT_TARGET_BRANCH: 'developer'
+  PROTECTED_BRANCHES: 'main,master,developer,uat'
+
+on:
+  push:
+    branches:
+      - '*'
+      - '!main'
+      - '!master'
+      - '!developer'
+      - '!uat'
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    # Add outputs to the job
+    outputs:
+      pr_url: ${{ steps.create_pr.outputs.pr_url }}
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get commit message and parse details
+        id: commit
+        run: |
+          # Get the full commit message
+          COMMIT_MSG=$(git log --format=%B -n 1 ${{ github.event.after }})
+          echo "message=$COMMIT_MSG" >> $GITHUB_OUTPUT
+          
+          # Check if commit message contains PR or pr
+          if [[ $COMMIT_MSG =~ [Pp][Rr] ]]; then
+            echo "create_pr=true" >> $GITHUB_OUTPUT
+            
+            # Extract ticket ID if present (now supports format like DEV-4090)
+            if [[ $COMMIT_MSG =~ with[[:space:]]+([A-Za-z]+-[0-9]+|[0-9]+) ]]; then
+              TICKET_ID="${BASH_REMATCH[1]}"
+              echo "ticket_id=$TICKET_ID" >> $GITHUB_OUTPUT
+            fi
+            
+            # Extract target branch
+            if [[ $COMMIT_MSG =~ pr[[:space:]]+to[[:space:]]+([a-zA-Z]+) ]]; then
+              TARGET_BRANCH="${BASH_REMATCH[1]}"
+              # If target branch is valid, use it; otherwise use default
+              if [[ -n "$TARGET_BRANCH" ]]; then
+                echo "target_branch=$TARGET_BRANCH" >> $GITHUB_OUTPUT
+              else
+                echo "target_branch=${{ env.DEFAULT_TARGET_BRANCH }}" >> $GITHUB_OUTPUT
+              fi
+            else
+              # Fallback to default branch if no target specified
+              echo "target_branch=${{ env.DEFAULT_TARGET_BRANCH }}" >> $GITHUB_OUTPUT
+            fi
+            
+            # Get truncated commit message (first line only)
+            TRUNCATED_MSG=$(echo "$COMMIT_MSG" | head -n 1)
+            echo "truncated_message=$TRUNCATED_MSG" >> $GITHUB_OUTPUT
+          else
+            echo "create_pr=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Debug extracted information
+        if: steps.commit.outputs.create_pr == 'true'
+        run: |
+          echo "Full message: ${{ steps.commit.outputs.message }}"
+          echo "Ticket ID: ${{ steps.commit.outputs.ticket_id }}"
+          echo "Target branch: ${{ steps.commit.outputs.target_branch }}"
+          echo "Truncated message: ${{ steps.commit.outputs.truncated_message }}"
+
+      - name: Create PR
+        id: create_pr
+        if: steps.commit.outputs.create_pr == 'true'
+        uses: repo-sync/pull-request@v2
+        with:
+          destination_branch: "${{ steps.commit.outputs.target_branch }}"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_title: "[${{ steps.commit.outputs.ticket_id }}] ${{ steps.commit.outputs.truncated_message }}"
+          pr_body: |
+            ## Description
+            Automated PR created from branch ${{ github.ref_name }}
+            Commit message: ${{ steps.commit.outputs.message }}
+
+            ## Related Issue
+            - [ ] Noion Task #${{ steps.commit.outputs.ticket_id }}
+
+            ## Types of changes
+            - [ ] Bug fix (non-breaking change which fixes an issue)
+            - [ ] Fix (non-breaking change which fixes an issue)
+            - [ ] New feature (non-breaking change which adds functionality)
+            - [ ] Breaking change (fix or feature that would cause existing functionality to change)
+            - [ ] Documentation update
+
+            ## Checklist:
+            - [ ] I have read the **CONTRIBUTING** document.
+            - [ ] I have added the notion task id: ${{ steps.commit.outputs.ticket_id }}
+            - [ ] My code follows the code style of this project.
+            - [ ] I have updated the required documentation if necessary.
+            - [ ] I have added tests to cover my changes.
+            - [ ] All new and existing tests passed.
+
+            ## Additional Notes
+            This PR was automatically created by GitHub Actions.
+          pr_label: "automated pr"
+
+      # Add PR URL summary
+      - name: Add PR URL to Job Summary
+        if: steps.commit.outputs.create_pr == 'true'
+        run: |
+          echo "### Pull Request Created Successfully! 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.create_pr.outputs.pr_url }}" >> $GITHUB_STEP_SUMMARY
